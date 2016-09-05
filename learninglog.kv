@@ -1,0 +1,206 @@
+<LearningLog>:
+    learning_intention: intention_box
+    success_yes: success_yes_button
+    success_part: success_part_button
+    success_no: success_no_button
+    lesson_success: success_box
+    next_steps: next_steps_box
+    comments: comments_box
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'top'
+
+        ScreenManager:
+            size_hint: 1, .9
+            id: _screen_manager
+            Screen:
+                name: 'screen1'
+                BoxLayout:
+                    orientation:    "vertical"
+
+
+
+                    BoxLayout:
+
+                        height: "60dp"
+                        size_hint_y: None
+
+                        Label:
+
+                    BoxLayout:
+
+                        height: "60dp"
+                        size_hint_y: None
+
+                        Label:
+
+                            size_hint_x: 30
+
+                            text: "Today's Learning Intention"
+
+                        TextInput:
+
+                            id: intention_box
+                            size_hint_x: 60
+
+                        Label:
+                            size_hint_x: 10
+
+                    BoxLayout:
+
+                        height: "40dp"
+                        size_hint_y: None
+
+                        Label:
+
+                            size_hint_x: 30
+
+                            text: "Did you meet the \nlearning intention?"
+                        BoxLayout:
+                            size_hint_x: 60
+
+                            ToggleButton:
+                                id: success_yes_button
+                                text: "Yes"
+                                group: "success"
+
+                            ToggleButton:
+                                id: success_part_button
+                                text: "Partially"
+                                group: "success"
+
+                            ToggleButton:
+                                id: success_no_button
+                                text: "No"
+                                group: "success"
+
+                        Label:
+                            size_hint_x: 10
+                    BoxLayout:
+
+                        height: "80dp"
+                        size_hint_y: None
+
+                        Label:
+
+                            size_hint_x: 30
+
+                            text: "What was your biggest \nsuccess during the lesson?"
+
+                        TextInput:
+
+                            id: success_box
+
+                            size_hint_x: 60
+
+                        Label:
+                            size_hint_x: 10
+                    BoxLayout:
+
+                        height: "80dp"
+                        size_hint_y: None
+
+                        Label:
+
+                            size_hint_x: 30
+
+                            text: "What are your next steps?"
+
+                        TextInput:
+                            id: next_steps_box
+
+                            size_hint_x: 60
+
+                        Label:
+                            size_hint_x: 10
+                    BoxLayout:
+
+                        height: "60dp"
+                        size_hint_y: None
+
+                        Label:
+
+                            size_hint_x: 30
+
+                            text: "Do you have anything you'd like \nto discuss with the teacher?"
+
+                        TextInput:
+                            id: comments_box
+                            size_hint_x: 60
+
+                        Label:
+                            size_hint_x: 10
+
+                    BoxLayout:
+                        size_hint_y: 2
+                        Label:
+
+                        Button:
+
+                            size_hint_y: 0.5
+                            text: "Submit statement"
+
+                            on_press: root.add_record()
+                        Label:
+
+                    BoxLayout:
+
+
+            Screen:
+                name: 'screen2'
+
+
+                AnchorLayout:
+                    anchor_x: 'center'
+                    anchor_y: 'center'
+
+                    ScrollView:
+
+
+                        MyGrid:
+                            cols: 5
+                            size_hint_y: None
+                            height: self.minimum_height
+                            text_size: self.size, None
+                            spacing: '1dp'
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'bottom'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, .1
+            Button:
+                text: 'Create Learning Log'
+                on_press: _screen_manager.current = 'screen1'
+            Button:
+                text: 'View Learning Log'
+                on_press: _screen_manager.current = 'screen2'
+
+<LearningRecord>:
+    size_hint_y: None
+    text_size: self.width, None
+    height: self.texture_size[1]
+
+    width: '100dp'
+
+    canvas.before:
+        Color:
+            rgb: 0.2, 0.2, 0.2
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<TableHeader>
+    size_hint_y: None
+    height: '30dp'
+    text_size: self.width, None
+
+
+    canvas.before:
+        Color:
+            rgb: 0.5, 0.5, 0.5
+        Rectangle:
+            pos: self.pos
+            size: self.size
