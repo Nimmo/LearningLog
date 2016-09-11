@@ -8,7 +8,7 @@ import time
 import json
 import os.path
 
-log_file = ""
+file_path = ""
 learning_log = []
 
 
@@ -37,7 +37,7 @@ class LearningLog(FloatLayout):
 
         learning_log.append(learning_record)
 
-        json.dump(learning_log, open(log_file, "w"))
+        json.dump(learning_log, open(file_path, "w"))
 
     def show_learning_log(self):
         self.clear_widgets()
@@ -107,10 +107,14 @@ class MyGrid(GridLayout):
 if __name__ == '__main__':
     username = getpass.getuser()
     session = get_session()
-    log_file = username + " " + session + " learning log.json"
-
-    if os.path.isfile(log_file):
-        learning_log = json.load(open(log_file))
+    home_dir = os.path.expanduser("~")
+    file_name = username + " " + session + " learning log.json"
+    file_directory = "Learning Log"
+    home_dir_parts = home_dir.split('\\')
+    file_path = os.path.join(home_dir, file_directory, file_name)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    if os.path.isfile(file_path):
+        learning_log = json.load(open(file_path))
 
     LearningLogApp().run()
 
