@@ -32,7 +32,7 @@ class LearningLog(FloatLayout):
     success_no = ObjectProperty()
     lesson_success = ObjectProperty()
     next_steps = ObjectProperty()
-    comments = ObjectProperty()
+    #comments = ObjectProperty()
 
     def add_record(self):
         learning_record = {}
@@ -46,7 +46,7 @@ class LearningLog(FloatLayout):
             learning_record["success"] = "N"
         learning_record["lesson_achievement"] = self.lesson_success.text
         learning_record["next steps"] = self.next_steps.text
-        learning_record["comments"] = self.comments.text
+        #learning_record["comments"] = self.comments.text
 
         learning_log.append(learning_record)
 
