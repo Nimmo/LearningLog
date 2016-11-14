@@ -21,49 +21,59 @@ import os.path
 file_path = ""
 learning_log = []
 
-# Generate the UI
-root = Tk()
-root.title("Learning Log")
+def draw_entry_ui(root):
+    # Generate the UI
 
-frame_main = ttk.Frame(root, padding="3 3 12 12")
-frame_main.grid(column=0, row=0, sticky=(N, W, E, S))
-frame_main.rowconfigure(0, weight=1)
+    root.title("Learning Log")
 
-# Learning intention block
-learning_intention = StringVar()
-frame_learning_intention = ttk.Frame(frame_main)
-frame_learning_intention.grid(column=0, row=0, sticky="WE")
-label_learning_intention = ttk.Label(frame_learning_intention, text="Learning intention:")
-label_learning_intention.grid(column=0, row=0, sticky="W")
-entry_learning_intention = ttk.Entry(frame_learning_intention, width=64, textvariable=learning_intention)
-entry_learning_intention.grid(column=0, row=1, sticky="E")
+    frame_main = ttk.Frame(root, padding="3 3 12 12")
+    frame_main.grid(column=0, row=0, sticky=(N, W, E, S))
+    frame_main.rowconfigure(0, weight=1)
 
-# Lesson Success Block
-success = StringVar()
-frame_lesson_success = ttk.Frame(frame_main)
-frame_lesson_success.grid(column=0, row=1, sticky = "WE")
-label_lesson_success = ttk.Label(frame_lesson_success, text="Did you achieve the learning intention?")
-label_lesson_success.grid(column=0, row=0, sticky="N")
-radio_yes = ttk.Radiobutton(frame_lesson_success, text="Yes", value=2)
-radio_yes.grid(column = 0, row = 1)
-radio_partially = ttk.Radiobutton(frame_lesson_success, text="Partially", value=1)
-radio_partially.grid(column = 1, row = 1)
-radio_no = ttk.Radiobutton(frame_lesson_success, text="No", value=0)
-radio_no.grid(column = 2, row = 1)
+    # Learning intention block
+    learning_intention = StringVar()
+    frame_learning_intention = ttk.Frame(frame_main)
+    frame_learning_intention.grid(column=0, row=0, sticky="WE")
+    label_learning_intention = ttk.Label(frame_learning_intention, text="Learning intention:")
+    label_learning_intention.grid(column=0, row=0, sticky="W")
+    entry_learning_intention = ttk.Entry(frame_learning_intention, width=64, textvariable=learning_intention)
+    entry_learning_intention.grid(column=0, row=1, sticky="E")
 
-# Lesson Achievement Block
-achievement = StringVar()
-frame_lesson_achievement = ttk.Frame(frame_main)
-frame_lesson_achievement.grid(column = 0, row = 2, sticky="WE")
-label_lesson_achievement = ttk.Label(frame_lesson_achievement, text="What was your greatest achievement during this lesson?")
-label_lesson_achievement.grid(column=0, row=0, sticky="WE")
-entry_lesson_achievement = ttk.Entry(frame_lesson_achievement, textvariable=achievement, width = 64)
-entry_lesson_achievement.grid(column=0, row=1, sticky="WE")
+    # Lesson Success Block
+    success = StringVar()
+    frame_lesson_success = ttk.Frame(frame_main)
+    frame_lesson_success.grid(column=0, row=1, sticky = "WE")
+    label_lesson_success = ttk.Label(frame_lesson_success, text="Did you achieve the learning intention?")
+    label_lesson_success.grid(column=0, row=0)
+    radio_yes = ttk.Radiobutton(frame_lesson_success, text="Yes", value=2)
+    radio_yes.grid(column = 0, row = 1, sticky="WE")
+    radio_partially = ttk.Radiobutton(frame_lesson_success, text="Partially", value=1)
+    radio_partially.grid(column = 1, row = 1, sticky="WE")
+    radio_no = ttk.Radiobutton(frame_lesson_success, text="No", value=0)
+    radio_no.grid(column = 2, row = 1, sticky="WE")
 
-for child in frame_main.winfo_children():
-    child.grid_configure(padx=5, pady=10)
+    # Lesson Achievement Block
+    achievement = StringVar()
+    frame_lesson_achievement = ttk.Frame(frame_main)
+    frame_lesson_achievement.grid(column = 0, row = 2, sticky="WE")
+    label_lesson_achievement = ttk.Label(frame_lesson_achievement, text="What was your greatest achievement during this lesson?")
+    label_lesson_achievement.grid(column=0, row=0, sticky="WE")
+    entry_lesson_achievement = ttk.Entry(frame_lesson_achievement, textvariable=achievement, width = 64)
+    entry_lesson_achievement.grid(column=0, row=1, sticky="WE")
 
-root.mainloop()
+    # Next Steps Block
+    next_steps = StringVar()
+    frame_next_steps = ttk.Frame(frame_main)
+    frame_next_steps.grid(column = 0, row = 2, sticky="WE")
+    label_next_steps = ttk.Label(frame_next_steps, text="What are your next steps?")
+    label_next_steps.grid(column=0, row=0, sticky="WE")
+    entry_next_steps = ttk.Entry(frame_next_steps, textvariable=achievement, width = 64)
+    entry_next_steps.grid(column=0, row=1, sticky="WE")
+
+    for child in frame_main.winfo_children():
+        child.grid_configure(padx=5, pady=10)
+
+
 '''
 class LearningLog(FloatLayout):
     learning_intention = ObjectProperty()
@@ -162,5 +172,7 @@ if __name__ == '__main__':
     if os.path.isfile(file_path):
         learning_log = json.load(open(file_path))
 
-   # LearningLogApp().run()
+    root = Tk()
+    draw_entry_ui(root)
+    root.mainloop()
 
