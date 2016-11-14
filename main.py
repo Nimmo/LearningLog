@@ -1,8 +1,4 @@
-from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import ObjectProperty
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
+import tkinter
 import getpass
 import time
 import json
