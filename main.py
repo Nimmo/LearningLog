@@ -4,6 +4,7 @@ import getpass
 import time
 import json
 import os.path
+import log_viewer
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,99 +20,103 @@ import os.path
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 file_path = ""
-learning_log = []
+learning_log = {}
 
-def draw_entry_ui(root):
-    # Generate the UI
-
-    root.title("Learning Log")
-
-    frame_main = ttk.Frame(root, padding="3 3 12 12")
+def display_entry_screen(root):
+    #Root Frame
     frame_main.grid(column=0, row=0, sticky=(N, W, E, S))
     frame_main.rowconfigure(0, weight=1)
 
-    # Learning intention block
-    learning_intention = StringVar()
-    frame_learning_intention = ttk.Frame(frame_main)
+    #LI Frame
     frame_learning_intention.grid(column=0, row=0, sticky="WE")
-    label_learning_intention = ttk.Label(frame_learning_intention, text="Learning intention:")
     label_learning_intention.grid(column=0, row=0, sticky="W")
-    entry_learning_intention = ttk.Entry(frame_learning_intention, width=64, textvariable=learning_intention)
     entry_learning_intention.grid(column=0, row=1, sticky="E")
 
-    # Lesson Success Block
-    success = StringVar()
-    frame_lesson_success = ttk.Frame(frame_main)
+    #Lesson Success Frame
     frame_lesson_success.grid(column=0, row=1, sticky = "WE")
-    label_lesson_success = ttk.Label(frame_lesson_success, text="Did you achieve the learning intention?")
     label_lesson_success.grid(column=0, row=0)
-    radio_yes = ttk.Radiobutton(frame_lesson_success, text="Yes", value=2)
     radio_yes.grid(column = 0, row = 1, sticky="WE")
-    radio_partially = ttk.Radiobutton(frame_lesson_success, text="Partially", value=1)
     radio_partially.grid(column = 1, row = 1, sticky="WE")
-    radio_no = ttk.Radiobutton(frame_lesson_success, text="No", value=0)
     radio_no.grid(column = 2, row = 1, sticky="WE")
 
-    # Lesson Achievement Block
-    achievement = StringVar()
-    frame_lesson_achievement = ttk.Frame(frame_main)
+    #Lesson Achievement Frame
     frame_lesson_achievement.grid(column = 0, row = 2, sticky="WE")
-    label_lesson_achievement = ttk.Label(frame_lesson_achievement, text="What was your greatest achievement during this lesson?")
     label_lesson_achievement.grid(column=0, row=0, sticky="WE")
-    entry_lesson_achievement = ttk.Entry(frame_lesson_achievement, textvariable=achievement, width = 64)
     entry_lesson_achievement.grid(column=0, row=1, sticky="WE")
 
-    # Next Steps Block
-    next_steps = StringVar()
-    frame_next_steps = ttk.Frame(frame_main)
-    frame_next_steps.grid(column = 0, row = 2, sticky="WE")
-    label_next_steps = ttk.Label(frame_next_steps, text="What are your next steps?")
+    #Next Steps Frame
+    frame_next_steps.grid(column = 0, row = 3, sticky="WE")
     label_next_steps.grid(column=0, row=0, sticky="WE")
-    entry_next_steps = ttk.Entry(frame_next_steps, textvariable=achievement, width = 64)
     entry_next_steps.grid(column=0, row=1, sticky="WE")
 
-    for child in frame_main.winfo_children():
-        child.grid_configure(padx=5, pady=10)
+
+def add_entry():
+    date = time.strftime("%d/%m/%y")
+
+    lesson_details = []
+    lesson_details.append(entry_learning_intention.get())
+    lesson_details.append(success.get())
+    lesson_details.append(lesson_achievement.get())
+    lesson_details.append(next_steps.get())
 
 
-'''
-class LearningLog(FloatLayout):
-    learning_intention = ObjectProperty()
-    success_yes = ObjectProperty()
-    success_part = ObjectProperty()
-    success_no = ObjectProperty()
-    lesson_success = ObjectProperty()
-    next_steps = ObjectProperty()
-    #comments = ObjectProperty()
+    learning_log[date] = lesson_details
 
-    def add_record(self):
-        learning_record = {}
-        learning_record["date"] = time.strftime("%d/%m/%y")
-        learning_record["learning_intention"] = self.learning_intention.text
-        if self.success_yes.state == "down":
-            learning_record["success"] = "Y"
-        elif self.success_part.state == "down":
-            learning_record["success"] = "P"
-        else:
-            learning_record["success"] = "N"
-        learning_record["lesson_achievement"] = self.lesson_success.text
-        learning_record["next steps"] = self.next_steps.text
-        #learning_record["comments"] = self.comments.text
+    json.dump(learning_log, open(file_path, "w"))
 
-        learning_log.append(learning_record)
-
-        json.dump(learning_log, open(file_path, "w"))
-
-    def show_learning_log(self):
-        self.clear_widgets()
-        self.add_widget(LearningLog())
+def view_log():
+    log_viewer.display_log(learning_log)
 
 
-class LearningLogApp(App):
-    def build(self):
-        return LearningLog()
+# Generate the UI
+root = Tk()
+root.title("Learning Log - Entry Screen")
 
-'''
+learning_intention = StringVar()
+success = StringVar()
+lesson_achievement = StringVar()
+next_steps = StringVar()
+
+frame_main = ttk.Frame(root, padding="3 3 12 12")
+
+
+# Learning intention block
+frame_learning_intention = ttk.Frame(frame_main)
+label_learning_intention = ttk.Label(frame_learning_intention, text="Learning intention:")
+entry_learning_intention = ttk.Entry(frame_learning_intention, width=64, textvariable=learning_intention)
+
+
+# Lesson Success Block
+frame_lesson_success = ttk.Frame(frame_main)
+label_lesson_success = ttk.Label(frame_lesson_success, text="Did you achieve the learning intention?")
+radio_yes = ttk.Radiobutton(frame_lesson_success, text="Yes", value="Y", variable = success)
+radio_partially = ttk.Radiobutton(frame_lesson_success, text="Partially", value="P", variable = success)
+radio_no = ttk.Radiobutton(frame_lesson_success, text="No", value="N", variable = success)
+
+# Lesson Achievement Block
+frame_lesson_achievement = ttk.Frame(frame_main)
+label_lesson_achievement = ttk.Label(frame_lesson_achievement, text="What was your greatest achievement during this lesson?")
+entry_lesson_achievement = ttk.Entry(frame_lesson_achievement, textvariable=lesson_achievement, width = 64)
+
+
+# Next Steps Block
+frame_next_steps = ttk.Frame(frame_main)
+label_next_steps = ttk.Label(frame_next_steps, text="What are your next steps?")
+entry_next_steps = ttk.Entry(frame_next_steps, textvariable=next_steps, width = 64)
+
+# Button controls
+frame_buttons = ttk.Frame(frame_main)
+frame_buttons.grid(column = 0, row = 4, sticky="WE")
+button_add_entry = ttk.Button(frame_buttons, text = "Add Entry", command = add_entry)
+button_add_entry.grid(column = 0, row = 0)
+button_view_log = ttk.Button(frame_buttons, text = "View Log", command = view_log)
+button_view_log.grid(column = 1, row = 0)
+
+
+for child in frame_main.winfo_children():
+    child.grid_configure(padx=5, pady=10)
+
+
 def get_session():
     month = int(time.strftime("%m"))
     year = int(time.strftime("%y"))
@@ -121,45 +126,6 @@ def get_session():
         session = str(year - 1) + "-" + str(year)
     return session
 
-'''
-class MyGrid(GridLayout):
-
-    def __init__(self, **kwargs):
-        super(MyGrid, self).__init__(**kwargs)
-        self.fetch_data_from_database()
-        self.display_scores()
-
-    def fetch_data_from_database(self):
-        self.data = learning_log
-
-    def display_scores(self):
-        self.clear_widgets()
-
-        row = self.create_header()
-        for item in row:
-            self.add_widget(item)
-
-        for i in range(len(self.data)):
-            row = self.add_record_to_table(i)
-            for item in row:
-                self.add_widget(item)
-
-    def create_header(self):
-        first_column = TableHeader(text="Date")
-        second_column = TableHeader(text="Learning Intention")
-        third_column = TableHeader(text="Successful?")
-        fourth_column = TableHeader(text="Achievement in Lesson")
-        fifth_column = TableHeader(text="Next Steps")
-        return [first_column, second_column, third_column, fourth_column, fifth_column]
-
-    def add_record_to_table(self, i):
-        first_column = LearningRecord(text=self.data[i]['date'])
-        second_column = LearningRecord(text=self.data[i]['learning_intention'])
-        third_column = LearningRecord(text=self.data[i]['success'])
-        fourth_column = LearningRecord(text=self.data[i]['lesson_achievement'])
-        fifth_column = LearningRecord(text=self.data[i]['next steps'])
-        return [first_column, second_column, third_column, fourth_column, fifth_column]
-'''
 if __name__ == '__main__':
     username = getpass.getuser()
     session = get_session()
@@ -172,7 +138,7 @@ if __name__ == '__main__':
     if os.path.isfile(file_path):
         learning_log = json.load(open(file_path))
 
-    root = Tk()
-    draw_entry_ui(root)
+
+    display_entry_screen(root)
     root.mainloop()
 
