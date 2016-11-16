@@ -8,8 +8,9 @@ def display_log(learning_log):
 
     root = Tk()
     root.title("Learning Log Viewer")
-
-    tree = ttk.Treeview(root)
+    root.geometry("830x600")
+    root.resizable(height=False, width=False)
+    tree = ttk.Treeview(root, height=560)
 
     tree["columns"]=("learning_intention", "success", "lesson_achievement", "next steps")
     #tree.column("date", width=100 )
@@ -22,7 +23,6 @@ def display_log(learning_log):
     tree.heading("success", text="Succsessful lesson?")
     tree.heading("lesson_achievement", text="Lesson Achievement")
     tree.heading("next steps", text="Next Steps")
-
     for each in list(learning_log.keys()):
         tree.insert("" , END, text=each, values=(learning_log[each][0],learning_log[each][1], learning_log[each][2], learning_log[each][3]))
 
