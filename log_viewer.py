@@ -5,7 +5,6 @@ import json
 
 def display_log(learning_log):
 
-
     root = Tk()
     root.title("Learning Log Viewer")
     root.geometry("830x600")
@@ -23,7 +22,10 @@ def display_log(learning_log):
     tree.heading("success", text="Succsessful lesson?")
     tree.heading("lesson_achievement", text="Lesson Achievement")
     tree.heading("next steps", text="Next Steps")
-    for each in list(learning_log.keys()):
+    dates = list(learning_log.keys())
+    dates.sort()
+    dates.reverse()
+    for each in dates:
         tree.insert("" , END, text=each, values=(learning_log[each][0],learning_log[each][1], learning_log[each][2], learning_log[each][3]))
 
     tree.grid(column = 0, row = 0, sticky="NSEW")
