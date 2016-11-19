@@ -1,11 +1,3 @@
-from tkinter import *
-from tkinter import ttk
-import getpass
-import time
-import json
-import os.path
-import log_viewer
-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -19,36 +11,46 @@ import log_viewer
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from tkinter import *
+from tkinter import ttk
+import getpass
+import time
+import json
+import os.path
+import log_viewer
+
 file_path = ""
 learning_log = {}
 
 def display_entry_screen(root):
-    #Root Frame
+    # Root Frame
     frame_main.grid(column=0, row=0, sticky=(N, W, E, S))
     frame_main.rowconfigure(0, weight=1)
 
-    #LI Frame
+    # LI Frame
     frame_learning_intention.grid(column=0, row=0, sticky="NWE")
     label_learning_intention.grid(column=0, row=0, sticky="W")
     entry_learning_intention.grid(column=0, row=1, sticky="WE")
 
-    #Lesson Success Frame
+    # Lesson Success Frame
     frame_lesson_success.grid(column=0, row=1, sticky = "WE")
     label_lesson_success.grid(column=0, row=0)
     radio_yes.grid(column = 0, row = 1, sticky="WE")
     radio_partially.grid(column = 1, row = 1, sticky="WE")
     radio_no.grid(column = 2, row = 1, sticky="WE")
 
-    #Lesson Achievement Frame
+    # Lesson Achievement Frame
     frame_lesson_achievement.grid(column = 0, row = 2, sticky="WE")
     label_lesson_achievement.grid(column=0, row=0, sticky="WE")
     entry_lesson_achievement.grid(column=0, row=1, sticky="WE")
 
-    #Next Steps Frame
+    # Next Steps Frame
     frame_next_steps.grid(column = 0, row = 3, sticky="WE")
     label_next_steps.grid(column=0, row=0, sticky="WE")
     entry_next_steps.grid(column=0, row=1, sticky="WE")
 
+def details_to_server():
+    pass
 
 def add_entry():
     date = time.strftime("%d/%m/%y")
@@ -59,13 +61,14 @@ def add_entry():
     lesson_details.append(lesson_achievement.get())
     lesson_details.append(next_steps.get())
 
-
     learning_log[date] = lesson_details
 
     json.dump(learning_log, open(file_path, "w"))
 
+
 def view_log():
     log_viewer.display_log(learning_log)
+
 
 def get_session():
     month = int(time.strftime("%m"))
@@ -175,11 +178,12 @@ if __name__ == '__main__':
     home_dir = os.path.expanduser("~")
     file_name = username + " " + session + " learning log.json"
     file_directory = "Learning Log"
-    home_dir_parts = home_dir.split('\\')
     file_path = os.path.join(home_dir, file_directory, file_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     if os.path.isfile(file_path):
         learning_log = json.load(open(file_path))
+    else:
+        learning_log["file_name"] = file_name
 
     display_entry_screen(root)
     root.mainloop()
