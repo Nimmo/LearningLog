@@ -18,9 +18,11 @@ import time
 import json
 import os.path
 import log_viewer
+import socket
 
 file_path = ""
 learning_log = {}
+
 
 def display_entry_screen(root):
     # Root Frame
@@ -35,35 +37,49 @@ def display_entry_screen(root):
     # Lesson Success Frame
     frame_lesson_success.grid(column=0, row=1, sticky = "WE")
     label_lesson_success.grid(column=0, row=0)
-    radio_yes.grid(column = 0, row = 1, sticky="WE")
-    radio_partially.grid(column = 1, row = 1, sticky="WE")
-    radio_no.grid(column = 2, row = 1, sticky="WE")
+    radio_yes.grid(column=0, row=1, sticky="WE")
+    radio_partially.grid(column=1, row=1, sticky="WE")
+    radio_no.grid(column=2, row=1, sticky="WE")
 
     # Lesson Achievement Frame
-    frame_lesson_achievement.grid(column = 0, row = 2, sticky="WE")
+    frame_lesson_achievement.grid(column=0, row=2, sticky="WE")
     label_lesson_achievement.grid(column=0, row=0, sticky="WE")
     entry_lesson_achievement.grid(column=0, row=1, sticky="WE")
 
     # Next Steps Frame
-    frame_next_steps.grid(column = 0, row = 3, sticky="WE")
+    frame_next_steps.grid(column=0, row=3, sticky="WE")
     label_next_steps.grid(column=0, row=0, sticky="WE")
     entry_next_steps.grid(column=0, row=1, sticky="WE")
 
-def details_to_server():
-    pass
+
+def details_to_server(log):
+    if os.path.isfile("server_settings.txt"):
+        settings_file = open("server_settings.txt", "r")
+        settings_data = settings_file.read()
+        settings = settings_data.split(",")
+        UDP_IP = settings[0]
+        UDP_PORT = int(settings[1])
+    else:
+        UDP_IP = "127.0.0.1"
+        UDP_PORT = 5005
+    to_send = json.dumps(log)
+    print("Sending our log to the server")
+    sock = socket.socket(socket.AF_INET,
+                         socket.SOCK_DGRAM)
+    sock.settimeout(2.0)
+    sock.sendto(to_send.encode(), (UDP_IP, UDP_PORT))
+    print("Send attempt complete")
+
 
 def add_entry():
     date = time.strftime("%d/%m/%y")
 
-    lesson_details = []
-    lesson_details.append(entry_learning_intention.get())
-    lesson_details.append(success.get())
-    lesson_details.append(lesson_achievement.get())
-    lesson_details.append(next_steps.get())
+    lesson_details = [entry_learning_intention.get(), success.get(), lesson_achievement.get(), next_steps.get()]
 
     learning_log[date] = lesson_details
 
     json.dump(learning_log, open(file_path, "w"))
+    details_to_server(learning_log)
 
 
 def view_log():
@@ -80,7 +96,6 @@ def get_session():
     return session
 
 if __name__ == '__main__':
-
     # Generate the UI
     root = Tk()
     root.title("Learning Log - Entry Screen")
@@ -116,18 +131,17 @@ if __name__ == '__main__':
     radio_yes = ttk.Radiobutton(frame_lesson_success,
                                 text="Yes",
                                 value="Y",
-                                variable = success)
+                                variable=success)
 
     radio_partially = ttk.Radiobutton(frame_lesson_success,
                                       text="Partially",
                                       value="P",
-                                      variable = success)
+                                      variable=success)
 
     radio_no = ttk.Radiobutton(frame_lesson_success,
                                text="No",
                                value="N",
-                               variable = success)
-
+                               variable=success)
 
     # Lesson Achievement Block
     frame_lesson_achievement = ttk.Frame(frame_main)
@@ -136,8 +150,7 @@ if __name__ == '__main__':
 
     entry_lesson_achievement = ttk.Entry(frame_lesson_achievement,
                                          textvariable=lesson_achievement,
-                                         width = 97)
-
+                                         width=97)
 
     # Next Steps Block
     frame_next_steps = ttk.Frame(frame_main)
@@ -146,29 +159,27 @@ if __name__ == '__main__':
 
     entry_next_steps = ttk.Entry(frame_next_steps,
                                  textvariable=next_steps,
-                                 width = 97)
-
+                                 width=97)
 
     # Button controls
     frame_buttons = ttk.Frame(frame_main)
-    frame_buttons.grid(column = 0,
-                       row = 4,
+    frame_buttons.grid(column=0,
+                       row=4,
                        sticky="WE")
 
     button_add_entry = ttk.Button(frame_buttons,
-                                  text = "Add Entry",
-                                  command = add_entry)
+                                  text="Add Entry",
+                                  command=add_entry)
 
-    button_add_entry.grid(column = 0,
-                          row = 0)
+    button_add_entry.grid(column=0,
+                          row=0)
 
     button_view_log = ttk.Button(frame_buttons,
-                                 text = "View Log",
-                                 command = view_log)
+                                 text="View Log",
+                                 command=view_log)
 
-    button_view_log.grid(column = 1,
-                         row = 0)
-
+    button_view_log.grid(column=1,
+                         row=0)
 
     for child in frame_main.winfo_children():
         child.grid_configure(padx=5, pady=10)
