@@ -4,17 +4,33 @@ import os
 import time
 
 UDP_IP = "0.0.0.0"
-UDP_PORT = 5005
+UDP_PORT = 5000
 
-sock = socket.socket(socket.AF_INET,  # Internet
-                     socket.SOCK_DGRAM)  # UDP
+def load_class_lists():
+    if os.path.isfile("class_lists.json"):
+        return json.load(open("class_lists.json"))            
+    else:
+        return {}
 
-sock.bind((UDP_IP, UDP_PORT))
+def find_class(file_name, class_list):
+    user_name = file_name.split(" ")[0].lower()
+    if class_list != {}:
+        for item in list(class_list.keys()):
+            if user_name in class_list[item]:
+                return item
+        return "unknown"
+    else:
+        return "unknown"
 
-def get_file_path(file_name):
-    home_dir = os.path.expanduser("~")
+def get_file_path(file_name, class_list):
+    if os.path.isfile("client settings.txt"):
+        client_settings_file = open("client settings.txt", "r")
+        home_dir = client_settings_file.readline()
+    else:
+        home_dir = os.path.expanduser("~")
     file_directory = "Learning Log - Pupils"
-    file_path = os.path.join(home_dir, file_directory, file_name)
+    class_directory = find_class(file_name, class_list)
+    file_path = os.path.join(home_dir, file_directory, class_directory, file_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     return file_path
 
@@ -53,10 +69,16 @@ def check_dates(received_data):
     return requested_dates
 
 
-def store_log(received_data):
+def store_log(received_data, class_list):
     file_name = received_data["file_name"]
-    file_path = get_file_path(file_name)
-    json.dump(received_data, open(file_path, "w"))
+    file_path = get_file_path(file_name, class_list)
+    if os.path.isfile(file_path):
+        existing_log = json.load(open(file_path))
+    else:
+        existing_log = {}
+    existing_log.update(received_data)
+    json.dump(existing_log, open(file_path, 'w'))
+    print("Wrote", str(len(list(received_data.keys()))-1), "log entries to:", file_path )
 
 
 def get_time():
@@ -67,14 +89,21 @@ def get_time():
 
 
 if __name__ == '__main__':
+    sock = socket.socket(socket.AF_INET,  # Internet
+                     socket.SOCK_DGRAM)  # UDP
 
+    sock.bind((UDP_IP, UDP_PORT))
+    class_list = load_class_lists()
+    print("Loaded", len(list(class_list.keys())), "classes.")
     while True:
 
-        data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
+        
+        
+        data, addr = sock.recvfrom(2048)  # buffer size is 1024 bytes
         received_data = eval(data.decode())
         current_time = get_time()
-        print("Received a log from", received_data["file_name"], "at", current_time)
-        store_log(received_data)
+        #print("Received a log from", received_data["file_name"], "at", current_time)
+        store_log(received_data, class_list)
         # needed_dates = check_dates(received_data)
 
-        sock.sendto("ack".encode(), addr)
+        #sock.sendto("ack".encode(), addr)

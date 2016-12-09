@@ -61,7 +61,7 @@ def details_to_server(log):
         UDP_PORT = int(settings[1])
     else:
         UDP_IP = "127.0.0.1"
-        UDP_PORT = 5005
+        UDP_PORT = 5000
     to_send = json.dumps(log)
     print("Sending our log to the server")
     sock = socket.socket(socket.AF_INET,
@@ -79,6 +79,7 @@ def add_entry():
     learning_log[date] = lesson_details
 
     json.dump(learning_log, open(file_path, "w"))
+    print("Wrote learning log to", file_path)
     details_to_server(learning_log)
 
 
@@ -95,7 +96,44 @@ def get_session():
         session = str(year - 1) + "-" + str(year)
     return session
 
+def get_file_path(file_name):
+    file_directory = "Learning Log"
+    migration_check = False
+    if os.path.isfile("client_settings.txt"):
+        try:
+            client_settings_file = open("client_settings.txt", "r")
+            home_dir = client_settings_file.readline()
+            #migration_check = True
+        except Exception as ex:
+            home_dir = os.path.expanduser("~")
+            print("Threw an exception:", ex)
+
+    else:
+            home_dir = os.path.expanduser("~")
+    #print(home_dir)
+
+    file_path = os.path.join(home_dir, file_directory, file_name)
+
+    if migration_check:
+        old_home = os.path.expanduser("~")
+        if old_home[0] == "C":
+            print("Initating migration check")
+            old_path = os.path.join(old_home, file_directory, file_name)
+            if os.path.isfile(old_path):
+                print("Migrating from old log file location")
+                old_log = json.load(old_path)
+                new_log = json.load(file_path)
+                print("Adding", len(list(old_log.keys() -1 )),"to list of",len(list(new_log.keys() -1 )), "entries in new file.")
+                new_log.update(old_log)
+                json.dump(new_log, open(file_path, "w"))
+                print("Deleting old file:", old_log)
+                os.remove(old_log)
+
+    print("Learning log path:",file_path)
+    return file_path
+
 if __name__ == '__main__':
+
     # Generate the UI
     root = Tk()
     root.title("Learning Log - Entry Screen")
@@ -186,14 +224,13 @@ if __name__ == '__main__':
     
     username = getpass.getuser()
     session = get_session()
-    home_dir = os.path.expanduser("~")
     file_name = username + " " + session + " learning log.json"
-    file_directory = "Learning Log"
-    file_path = os.path.join(home_dir, file_directory, file_name)
+
+    file_path = get_file_path(file_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    if os.path.isfile(file_path):
+    try:
         learning_log = json.load(open(file_path))
-    else:
+    except Exception:
         learning_log["file_name"] = file_name
 
     display_entry_screen(root)
