@@ -14,6 +14,7 @@
 from tkinter import *
 from tkinter import ttk
 
+
 def display_log(learning_log):
 
     root = Tk()
@@ -36,8 +37,8 @@ def display_log(learning_log):
     dates.sort()
     dates.reverse()
     for each in dates:
-        tree.insert("" , END, text=each, values=(learning_log[each][0],learning_log[each][1], learning_log[each][2], learning_log[each][3]))
+        tree.insert("", END, text=each, values=(learning_log[each][0],learning_log[each][1], learning_log[each][2], learning_log[each][3]))
 
-    tree.grid(column = 0, row = 0, sticky="NSEW")
+    tree.grid(column=0, row=0, sticky="NSEW")
 
     root.mainloop()

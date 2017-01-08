@@ -61,7 +61,7 @@ def details_to_server(log):
         UDP_PORT = int(settings[1])
     else:
         UDP_IP = "127.0.0.1"
-        UDP_PORT = 5000
+        UDP_PORT = 5005
     to_send = json.dumps(log)
     print("Sending our log to the server")
     sock = socket.socket(socket.AF_INET,
@@ -91,10 +91,10 @@ def get_session():
     month = int(time.strftime("%m"))
     year = int(time.strftime("%y"))
     if month > 8:
-        session = str(year) + "-" + str(year + 1)
+        return str(year) + "-" + str(year + 1)
     else:
-        session = str(year - 1) + "-" + str(year)
-    return session
+        return str(year - 1) + "-" + str(year)
+
 
 def get_file_path(file_name):
     file_directory = "Learning Log"
@@ -103,33 +103,34 @@ def get_file_path(file_name):
         try:
             client_settings_file = open("client_settings.txt", "r")
             home_dir = client_settings_file.readline()
-            #migration_check = True
+            migration_check = True
         except Exception as ex:
             home_dir = os.path.expanduser("~")
             print("Threw an exception:", ex)
 
     else:
             home_dir = os.path.expanduser("~")
-    #print(home_dir)
+    # print(home_dir)
 
     file_path = os.path.join(home_dir, file_directory, file_name)
+    try:
+        if migration_check:
+            old_home = os.path.expanduser("~")
+            if old_home[0] != home_dir[0]:
+                print("Initating migration check")
+                old_path = os.path.join(old_home, file_directory, file_name)
+                if os.path.isfile(old_path):
+                    print("Migrating from old log file location")
+                    old_log = json.load(old_path)
+                    new_log = json.load(file_path)
+                    print("Adding", len(list(old_log.keys()))-1, "to list of", len(list(new_log.keys()))-1, "entries in new file.")
+                    new_log.update(old_log)
+                    json.dump(new_log, open(file_path, "w"))
+                    print("Deleting old file:", old_log)
+                    os.remove(old_log)
+    except Exception as ex:
+        print("Encountered an exception: " + ex)
 
-    if migration_check:
-        old_home = os.path.expanduser("~")
-        if old_home[0] == "C":
-            print("Initating migration check")
-            old_path = os.path.join(old_home, file_directory, file_name)
-            if os.path.isfile(old_path):
-                print("Migrating from old log file location")
-                old_log = json.load(old_path)
-                new_log = json.load(file_path)
-                print("Adding", len(list(old_log.keys() -1 )),"to list of",len(list(new_log.keys() -1 )), "entries in new file.")
-                new_log.update(old_log)
-                json.dump(new_log, open(file_path, "w"))
-                print("Deleting old file:", old_log)
-                os.remove(old_log)
-
-    print("Learning log path:",file_path)
     return file_path
 
 if __name__ == '__main__':
@@ -228,9 +229,14 @@ if __name__ == '__main__':
 
     file_path = get_file_path(file_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
     try:
+        # Attempt to open an existing learning log
         learning_log = json.load(open(file_path))
-    except Exception:
+        print("Loaded learning log from: " + file_path)
+    except FileNotFoundError:
+        print("No existing learning log found, preparing to create a new one.")
+        # If there is no existing learning log, prepare for it to be created
         learning_log["file_name"] = file_name
 
     display_entry_screen(root)

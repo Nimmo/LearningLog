@@ -2,15 +2,12 @@ import socket
 import json
 import os
 import time
+import class_management
 
+# Default ip and port to listen on
 UDP_IP = "0.0.0.0"
-UDP_PORT = 5000
+UDP_PORT = 5005
 
-def load_class_lists():
-    if os.path.isfile("class_lists.json"):
-        return json.load(open("class_lists.json"))            
-    else:
-        return {}
 
 def find_class(file_name, class_list):
     user_name = file_name.split(" ")[0].lower()
@@ -18,9 +15,13 @@ def find_class(file_name, class_list):
         for item in list(class_list.keys()):
             if user_name in class_list[item]:
                 return item
+        
+        class_management.new_unknown(user_name)
         return "unknown"
     else:
+        class_management.new_unknown(user_name)
         return "unknown"
+
 
 def get_file_path(file_name, class_list):
     if os.path.isfile("client settings.txt"):
@@ -33,6 +34,7 @@ def get_file_path(file_name, class_list):
     file_path = os.path.join(home_dir, file_directory, class_directory, file_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     return file_path
+
 
 def read_file(file_name):
     file_path = get_file_path(file_name)
@@ -69,16 +71,16 @@ def check_dates(received_data):
     return requested_dates
 
 
-def store_log(received_data, class_list):
-    file_name = received_data["file_name"]
+def store_log(received_log, class_list):
+    file_name = received_log["file_name"]
     file_path = get_file_path(file_name, class_list)
     if os.path.isfile(file_path):
         existing_log = json.load(open(file_path))
     else:
         existing_log = {}
-    existing_log.update(received_data)
+    existing_log.update(received_log)
     json.dump(existing_log, open(file_path, 'w'))
-    print("Wrote", str(len(list(received_data.keys()))-1), "log entries to:", file_path )
+    print("Wrote", str(len(list(received_log.keys()))-1), "log entries to:", file_path )
 
 
 def get_time():
@@ -89,21 +91,20 @@ def get_time():
 
 
 if __name__ == '__main__':
+
     sock = socket.socket(socket.AF_INET,  # Internet
-                     socket.SOCK_DGRAM)  # UDP
+                         socket.SOCK_DGRAM)  # UDP
 
     sock.bind((UDP_IP, UDP_PORT))
-    class_list = load_class_lists()
+    class_list = class_management.load_class_list()
     print("Loaded", len(list(class_list.keys())), "classes.")
-    while True:
 
-        
-        
+    while True:
         data, addr = sock.recvfrom(2048)  # buffer size is 1024 bytes
         received_data = eval(data.decode())
-        current_time = get_time()
-        #print("Received a log from", received_data["file_name"], "at", current_time)
+        # current_time = get_time()
+        # print("Received a log from", received_data["file_name"], "at", current_time)
         store_log(received_data, class_list)
         # needed_dates = check_dates(received_data)
 
-        #sock.sendto("ack".encode(), addr)
+        # sock.sendto("ack".encode(), addr)
