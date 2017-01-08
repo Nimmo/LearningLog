@@ -1,7 +1,7 @@
 import os
 import json
 import time
-from lib.nimmo_library import *
+from nimmo_library import *
 
 
 def load_class_list():
@@ -36,6 +36,14 @@ def build_class_list():
 
 def manage_pupils(class_list):
     try:
+        server_settings = json.load(open("server_settings.json"))
+        log_dir = server_settings["log_dir"]
+
+    except FileNotFoundError:
+        print("Server settings file not found, assuming default settings")
+        sys.exit()
+
+    try:
         unknown_pupils = json.load(open("unknown_pupils.txt"))
         for day in list(unknown_pupils.keys()):
             current_day = unknown_pupils[day]
@@ -57,6 +65,7 @@ def manage_pupils(class_list):
                         for pupil in current_day[lesson]:
                             if pupil not in class_list[class_title]:
                                 class_list[class_title].append(pupil)
+                                migrate_log_file(log_dir, class_title, pupil)
                         unknown_pupils[day][lesson] = []
                     else:
                         day_complete = False
@@ -124,9 +133,19 @@ def get_file_path(log_directory, file_name, class_list):
     return file_path
 
 
-def migrate_log_file():
+def migrate_log_file(log_dir, class_title, user_name):
+    import shutil
     try:
-        server_settings = json.load(open("server_settings.json"))
-        log_directory = ""
+        files = os.listdir(log_dir)
+        for file in files:
+            if file.startswith(user_name):
+                old_path = os.path.join(log_dir, "unknown", file)
+                os.makedirs(os.path.join(log_dir, class_title), exist_ok=True)
+                new_path = os.path.join(log_dir, class_title, file)
+                print("Copying", old_path, "to", new_path, ".")
+                shutil.copyfile(old_path, new_path)
+                os.remove(old_path)
+
     except FileNotFoundError:
-        print("Server settings file not found, assuming default settings")
+        print("User's old file doesn't exist, skipping copy.")
+

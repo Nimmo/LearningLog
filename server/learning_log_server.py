@@ -2,8 +2,8 @@ import socket
 import json
 import os
 import time
-import server.class_management as class_manager
-from lib.nimmo_library import yes_no_confirmation
+import class_management as class_manager
+from nimmo_library import yes_no_confirmation
 
 
 def init():

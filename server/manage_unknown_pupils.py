@@ -1,4 +1,4 @@
-import server.class_management as class_manager
+import class_management as class_manager
 
 
 if __name__ == "__main__":
