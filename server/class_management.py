@@ -1,6 +1,7 @@
 import os
 import json
 import time
+from lib.nimmo_library import *
 
 
 def load_class_list():
@@ -31,14 +32,6 @@ def build_class_list():
     else:
         print("Restarting class list creation process.")
         return build_class_list()
-
-
-def yes_no_confirmation(prompt):
-    response = input(prompt).lower()
-    while response != "y" and response != "n":
-        print("Please answer Y for yes or N for no.")
-        response = input(prompt).lower()
-    return response == "y"
 
 
 def manage_pupils(class_list):
@@ -83,7 +76,7 @@ def new_unknown(user_name):
     if os.path.isfile("unknown_pupils.txt"):
         unknown_pupils = json.load(open("unknown_pupils.txt"))
     else:
-        unknown_pupils = {day:[[], [], [], [], [], []]}
+        unknown_pupils = {day: [[], [], [], [], [], []]}
     if user_name not in unknown_pupils[day][lesson]:
         unknown_pupils[day][lesson].append(user_name)
 
@@ -107,3 +100,33 @@ def find_lesson():
         return day, 5
     else:
         return day, 0
+
+
+def find_class(file_name, class_list):
+    user_name = file_name.split(" ")[0].lower()
+    if class_list != {}:
+        for item in list(class_list.keys()):
+            if user_name in class_list[item]:
+                return item
+
+        new_unknown(user_name)
+        return "unknown"
+    else:
+        new_unknown(user_name)
+        return "unknown"
+
+
+def get_file_path(log_directory, file_name, class_list):
+
+    class_directory = find_class(file_name, class_list)
+    file_path = os.path.join(log_directory, class_directory, file_name)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    return file_path
+
+
+def migrate_log_file():
+    try:
+        server_settings = json.load(open("server_settings.json"))
+        log_directory = ""
+    except FileNotFoundError:
+        print("Server settings file not found, assuming default settings")
