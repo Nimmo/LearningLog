@@ -8,7 +8,14 @@ def yes_no_confirmation(prompt):
 
 def get_int(prompt, min, max):
     user_input = int(input(prompt))
-    while min <= user_input <= max:
+    while not min <= user_input <= max:
+        user_input = int(input(prompt))
+
+    return user_input
+
+def get_int(prompt, min):
+    user_input = int(input(prompt))
+    while not min <= user_input:
         user_input = int(input(prompt))
 
     return user_input

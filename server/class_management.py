@@ -2,11 +2,12 @@ import os
 import json
 import time
 from nimmo_library import *
+import sys
 
 
 def load_class_list():
     if os.path.isfile("class_lists.json"):
-        return json.load(open("class_lists.json"))            
+        return json.load(open("class_lists.json"))
     else:
         create_classes = yes_no_confirmation("No classes are defined, would you like to create some? (Y/N)")
 
@@ -80,54 +81,68 @@ def manage_pupils(class_list):
         print("Unknown pupils file not found, no need to update class list")
 
 
-def new_unknown(user_name):
-    day, lesson = find_lesson()
+def new_unknown(user_name, lesson_times):
+    day, lesson = find_lesson(lesson_times)
     if os.path.isfile("unknown_pupils.txt"):
         unknown_pupils = json.load(open("unknown_pupils.txt"))
     else:
         unknown_pupils = {day: [[], [], [], [], [], []]}
-    if user_name not in unknown_pupils[day][lesson]:
+    try:
+        if user_name not in unknown_pupils[day][lesson]:
+            unknown_pupils[day][lesson].append(user_name)
+    except KeyError:
+        unknown_pupils[day] = [[], [], [], [], [], []]
         unknown_pupils[day][lesson].append(user_name)
-
     json.dump(unknown_pupils, open("unknown_pupils.txt", "w"))
 
 
-def find_lesson():
+def get_lesson_list():
+    if os.path.isfile("lesson_times.json"):
+        return json.load(open("lesson_times.json"))
+    else:
+        lesson_count = get_int("How many lessons are there in a day? ", 0)
+        lesson_times = []
+        for times in range(lesson_count):
+            prompt = "What time does lesson " + str(times + 1) + " start? "
+            start_time = input(prompt)
+            prompt = "What time does lesson " + str(times + 1) + " end? "
+            end_time = input(prompt)
+            start_mins = 60 * int(start_time[0:2]) + int(start_time[-2:])
+            end_mins = 60 * int(end_time[0:2]) + int(end_time[-2:])
+            lesson_times.append([start_mins, end_mins])
+
+        json.dump(lesson_times, open("lesson_times.json", "w"))
+        return lesson_times
+
+
+def find_lesson(lesson_times):
     day = time.strftime("%A %d/%m/%Y")
     hours = int(time.strftime("%H"))
     minutes = int(time.strftime("%M"))
     current_time = hours * 60 + minutes
-    if 510 <= current_time <= 570:
-        return day, 1
-    elif 570 < current_time <= 630:
-        return day, 2
-    elif 650 < current_time <= 710:
-        return day, 3
-    elif 710 < current_time <= 770:
-        return day, 4
-    elif 650 < current_time <= 810:
-        return day, 5
-    else:
-        return day, 0
+    for lesson in range(len(lesson_times)):
+        if lesson_times[lesson][0] <= current_time <= lesson_times[lesson][1]:
+            return day, lesson + 1
+    return day, 0
 
 
-def find_class(file_name, class_list):
+def find_class(file_name, class_list, lesson_times):
     user_name = file_name.split(" ")[0].lower()
     if class_list != {}:
         for item in list(class_list.keys()):
             if user_name in class_list[item]:
                 return item
 
-        new_unknown(user_name)
+        new_unknown(user_name, lesson_times)
         return "unknown"
     else:
-        new_unknown(user_name)
+        new_unknown(user_name, lesson_times)
         return "unknown"
 
 
-def get_file_path(log_directory, file_name, class_list):
+def get_file_path(log_directory, file_name, class_list, lesson_times):
 
-    class_directory = find_class(file_name, class_list)
+    class_directory = find_class(file_name, class_list, lesson_times)
     file_path = os.path.join(log_directory, class_directory, file_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     return file_path

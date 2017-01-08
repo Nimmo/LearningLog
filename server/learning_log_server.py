@@ -33,11 +33,12 @@ def init():
                         print("there was a problem creating that path, please provide the path again")
         server_settings = {"ip": ip, "port": port, "log_dir": log_dir}
         json.dump(server_settings, open("server_settings.json", "w"))
-    return ip, port, log_dir
+    lessons = class_manager.get_lesson_list()
+    return ip, port, log_dir, lessons
 
 
 def store_log(received_log):
-    file_path = class_manager.get_file_path(log_directory, received_log["file_name"], class_list)
+    file_path = class_manager.get_file_path(log_directory, received_log["file_name"], class_list, lesson_times)
     if os.path.isfile(file_path):
         existing_log = json.load(open(file_path))
     else:
@@ -55,7 +56,7 @@ def get_time():
 
 
 if __name__ == '__main__':
-    UDP_IP, UDP_PORT, log_directory = init()
+    UDP_IP, UDP_PORT, log_directory, lesson_times = init()
     sock = socket.socket(socket.AF_INET,  # Internet
                          socket.SOCK_DGRAM)  # UDP
 
