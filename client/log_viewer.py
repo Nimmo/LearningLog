@@ -20,26 +20,29 @@ def display_log(learning_log):
 
     root = Tk()
     root.title("Learning Log Viewer")
-    root.geometry("830x600")
+    root.geometry("950x400")
     root.resizable(height=False, width=False)
     tree = ttk.Treeview(root)
 
     tree["columns"]=("learning_intention", "success", "lesson_achievement", "next steps")
-    tree.column("learning_intention", width=200)
-    tree.column("success", width=20)
-    tree.column("lesson_achievement", width=200)
-    tree.column("next steps", width=200)
+    tree.column("learning_intention", width=250)
+    tree.column("success", width=40)
+    tree.column("lesson_achievement", width=300)
+    tree.column("next steps", width=300)
     tree.heading("learning_intention", text="Learning Intention")
-    tree.heading("success", text="Successful lesson?")
+    tree.heading("success", text="Success?")
     tree.heading("lesson_achievement", text="Lesson Achievement")
     tree.heading("next steps", text="Next Steps")
 
     v_scroll = ttk.Scrollbar(root, orient=VERTICAL, command=tree.yview)
+    h_scroll = ttk.Scrollbar(root, orient=HORIZONTAL, command=tree.xview)
 
     tree["yscrollcommand"] = v_scroll.set
+    tree["xscrollcommand"] = h_scroll.set
 
     tree.grid(column=0, row=0, sticky="N,W,E,S")
     v_scroll.grid(column=1, row=0, sticky="SN")
+    h_scroll.grid(column=0, row=1, sticky="EW")
 
     root.grid_columnconfigure(0, weight=1)
     root.grid_rowconfigure(0, weight=1)
@@ -49,8 +52,13 @@ def display_log(learning_log):
     sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%d/%m/%y"))
     dates.reverse()
     for each in dates:
-        tree.insert("", END, text=each, values=(learning_log[each][0],learning_log[each][1], learning_log[each][2], learning_log[each][3]))
+        if learning_log[each][1] == "y":
+            success = "Yes"
+        elif learning_log[each][1] == "p":
+            success = "Partially"
+        else:
+            success = "No"
 
-
+        tree.insert("", END, text=each, values=(learning_log[each][0],success, learning_log[each][2], learning_log[each][3]))
 
     root.mainloop()
