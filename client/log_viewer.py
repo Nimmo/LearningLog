@@ -13,6 +13,7 @@
 
 from tkinter import *
 from tkinter import ttk
+import datetime
 
 
 def display_log(learning_log):
@@ -21,7 +22,7 @@ def display_log(learning_log):
     root.title("Learning Log Viewer")
     root.geometry("830x600")
     root.resizable(height=False, width=False)
-    tree = ttk.Treeview(root, height=560)
+    tree = ttk.Treeview(root)
 
     tree["columns"]=("learning_intention", "success", "lesson_achievement", "next steps")
     tree.column("learning_intention", width=200)
@@ -29,16 +30,27 @@ def display_log(learning_log):
     tree.column("lesson_achievement", width=200)
     tree.column("next steps", width=200)
     tree.heading("learning_intention", text="Learning Intention")
-    tree.heading("success", text="Succsessful lesson?")
+    tree.heading("success", text="Successful lesson?")
     tree.heading("lesson_achievement", text="Lesson Achievement")
     tree.heading("next steps", text="Next Steps")
+
+    v_scroll = ttk.Scrollbar(root, orient=VERTICAL, command=tree.yview)
+
+    tree["yscrollcommand"] = v_scroll.set
+
+    tree.grid(column=0, row=0, sticky="N,W,E,S")
+    v_scroll.grid(column=1, row=0, sticky="SN")
+
+    root.grid_columnconfigure(0, weight=1)
+    root.grid_rowconfigure(0, weight=1)
+
     dates = list(learning_log.keys())
     dates.remove("file_name")
-    dates.sort()
+    sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%d/%m/%y"))
     dates.reverse()
     for each in dates:
         tree.insert("", END, text=each, values=(learning_log[each][0],learning_log[each][1], learning_log[each][2], learning_log[each][3]))
 
-    tree.grid(column=0, row=0, sticky="NSEW")
+
 
     root.mainloop()
