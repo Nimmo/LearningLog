@@ -49,7 +49,7 @@ def display_log(learning_log):
 
     dates = list(learning_log.keys())
     dates.remove("file_name")
-    sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%d/%m/%y"))
+    dates = sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%d/%m/%y"))
     dates.reverse()
     for each in dates:
         if learning_log[each][1] == "y":
