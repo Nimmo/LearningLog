@@ -57,8 +57,13 @@ def details_to_server(log):
         settings_file = open("server_settings.txt", "r")
         settings_data = settings_file.read()
         settings = settings_data.split(",")
-        UDP_IP = settings[0]
-        UDP_PORT = int(settings[1])
+        # [Type, address, port]
+        address_type = settings[0]
+        if address_type == "ip":
+            UDP_IP = settings[1]
+        elif address_type == "host":
+            UDP_IP = socket.gethostbyname_ex(settings[1])[2][0]
+        UDP_PORT = int(settings[2])
     else:
         UDP_IP = "127.0.0.1"
         UDP_PORT = 5005
