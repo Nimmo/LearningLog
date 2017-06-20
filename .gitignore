@@ -1,2 +1,11 @@
+# Development files
 __pycache__
 .idea
+
+# Settings files
+client/client_settings.txt
+client/server_settings.txt
+server/class_lists.json
+server/lesson_times.json
+server/unknown_pupils.txt
+server/server_settings.json
