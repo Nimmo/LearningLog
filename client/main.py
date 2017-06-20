@@ -60,19 +60,23 @@ def details_to_server(log):
         # [Type, address, port]
         address_type = settings[0]
         if address_type == "ip":
-            UDP_IP = settings[1]
+            udp_ip = settings[1]
+            udp_port = int(settings[2])
         elif address_type == "host":
-            UDP_IP = socket.gethostbyname_ex(settings[1])[2][0]
-        UDP_PORT = int(settings[2])
+            udp_ip = socket.gethostbyname_ex(settings[1])[2][0]
+            udp_port = int(settings[2])
+        else:
+            udp_ip = "127.0.0.1"
+            udp_port = "5005"
     else:
-        UDP_IP = "127.0.0.1"
-        UDP_PORT = 5005
+        udp_ip = "127.0.0.1"
+        udp_port = 5005
     to_send = json.dumps(log)
     print("Sending our log to the server")
     sock = socket.socket(socket.AF_INET,
                          socket.SOCK_DGRAM)
     sock.settimeout(2.0)
-    sock.sendto(to_send.encode(), (UDP_IP, UDP_PORT))
+    sock.sendto(to_send.encode(), (udp_ip, udp_port))
     print("Send attempt complete")
 
 
@@ -103,12 +107,11 @@ def get_session():
 
 def get_file_path(file_name):
     file_directory = "Learning Log"
-    migration_check = False
+
     if os.path.isfile("client_settings.txt"):
         try:
             client_settings_file = open("client_settings.txt", "r")
             home_dir = client_settings_file.readline()
-            migration_check = True
         except Exception as ex:
             home_dir = os.path.expanduser("~")
             print("Threw an exception:", ex)
@@ -118,23 +121,6 @@ def get_file_path(file_name):
     # print(home_dir)
 
     file_path = os.path.join(home_dir, file_directory, file_name)
-    try:
-        if migration_check:
-            old_home = os.path.expanduser("~")
-            if old_home[0] != home_dir[0]:
-                print("Initating migration check")
-                old_path = os.path.join(old_home, file_directory, file_name)
-                if os.path.isfile(old_path):
-                    print("Migrating from old log file location")
-                    old_log = json.load(old_path)
-                    new_log = json.load(file_path)
-                    print("Adding", len(list(old_log.keys()))-1, "to list of", len(list(new_log.keys()))-1, "entries in new file.")
-                    new_log.update(old_log)
-                    json.dump(new_log, open(file_path, "w"))
-                    print("Deleting old file:", old_log)
-                    os.remove(old_log)
-    except Exception as ex:
-        print("Encountered an exception: " + ex)
 
     return file_path
 

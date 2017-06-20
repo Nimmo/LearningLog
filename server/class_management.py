@@ -86,12 +86,16 @@ def new_unknown(user_name, lesson_times):
     if os.path.isfile("unknown_pupils.txt"):
         unknown_pupils = json.load(open("unknown_pupils.txt"))
     else:
-        unknown_pupils = {day: [[], [], [], [], [], []]}
+        unknown_pupils = {day: []}
+        for i in range (len(lesson_times) + 1):
+            unknown_pupils[day].append([])
     try:
         if user_name not in unknown_pupils[day][lesson]:
             unknown_pupils[day][lesson].append(user_name)
     except KeyError:
-        unknown_pupils[day] = [[], [], [], [], [], []]
+        unknown_pupils[day] = []
+        for i in range (len(lesson_times) + 1):
+            unknown_pupils[day].append([])
         unknown_pupils[day][lesson].append(user_name)
     json.dump(unknown_pupils, open("unknown_pupils.txt", "w"))
 
