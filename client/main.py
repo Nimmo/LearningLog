@@ -99,7 +99,7 @@ def view_log():
 def get_session():
     month = int(time.strftime("%m"))
     year = int(time.strftime("%y"))
-    if month > 8:
+    if month >= 8:
         return str(year) + "-" + str(year + 1)
     else:
         return str(year - 1) + "-" + str(year)

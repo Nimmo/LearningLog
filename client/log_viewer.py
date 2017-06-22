@@ -52,9 +52,9 @@ def display_log(learning_log):
     dates = sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%d/%m/%y"))
     dates.reverse()
     for each in dates:
-        if learning_log[each][1] == "y":
+        if learning_log[each][1] == "Y":
             success = "Yes"
-        elif learning_log[each][1] == "p":
+        elif learning_log[each][1] == "P":
             success = "Partially"
         else:
             success = "No"

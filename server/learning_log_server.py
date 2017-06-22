@@ -30,7 +30,7 @@ def init():
                         os.makedirs(log_dir, exist_ok=True)
                         created = True
                     except:
-                        print("there was a problem creating that path, please provide the path again")
+                        print("There was a problem creating that path, please provide the path again")
         server_settings = {"ip": ip, "port": port, "log_dir": log_dir}
         json.dump(server_settings, open("server_settings.json", "w"))
     lessons = class_manager.get_lesson_list()
