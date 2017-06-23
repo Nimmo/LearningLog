@@ -84,12 +84,16 @@ def add_entry():
     date = time.strftime("%d/%m/%y")
 
     lesson_details = [entry_learning_intention.get(), success.get(), lesson_achievement.get(), next_steps.get()]
-
-    learning_log[date] = lesson_details
-
-    json.dump(learning_log, open(file_path, "w"))
-    print("Wrote learning log to", file_path)
-    details_to_server(learning_log)
+    try:
+        if learning_log[date] == lesson_details:
+            print("You have already submitted this learning log.")
+        else:
+            raise KeyError
+    except KeyError:
+        learning_log[date] = lesson_details
+        json.dump(learning_log, open(file_path, "w"))
+        print("Wrote learning log to", file_path)
+        details_to_server(learning_log)
 
 
 def view_log():
@@ -123,6 +127,7 @@ def get_file_path(file_name):
     file_path = os.path.join(home_dir, file_directory, file_name)
 
     return file_path
+
 
 if __name__ == '__main__':
 

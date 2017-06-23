@@ -2,6 +2,11 @@
 __pycache__
 .idea
 
+# PyInstaller Files
+client/build/
+client/dist/
+client/main.spec
+
 # Settings files
 client/client_settings.txt
 client/server_settings.txt
@@ -9,3 +14,4 @@ server/class_lists.json
 server/lesson_times.json
 server/unknown_pupils.txt
 server/server_settings.json
+
