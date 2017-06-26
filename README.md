@@ -2,6 +2,8 @@
 
 A tool to allow pupils to log their learning over time to show progress over time.
 
+![Learning Log Viewer](screenshots/LearnigLogViewer.png?raw=true "Learning Log Viewer")
+
 ## Getting Started
 
 To get started download the repository and place the contents of the client folder into a location which all pupils can access.
@@ -68,7 +70,7 @@ See also the list of [contributors](https://github.com/Nimmo/LearningLog/graphs/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GPL v3 License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
