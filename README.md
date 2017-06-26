@@ -2,8 +2,6 @@
 
 A tool to allow pupils to log their learning over time to show progress over time.
 
-![Learning Log Viewer](screenshots/LearnigLogViewer.png?raw=true "Learning Log Viewer")
-
 ## Getting Started
 
 To get started download the repository and place the contents of the client folder into a location which all pupils can access.
